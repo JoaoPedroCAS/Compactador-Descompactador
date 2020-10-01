@@ -1,40 +1,20 @@
 #include <stdio.h> //BIBLIOTECA IN E OUT
 #include <stdlib.h> //BIBLIOTECA PADRÃO
-#define alpha 29 //NOSSO ALFABETO TERA 29 ELEMENTOS, DE a À z, ' ', '\n', 'EOF'.
+#define alpha 30 //NOSSO ALFABETO TERA 29 ELEMENTOS, DE a À z, ' ', '\n', 'EOF'. 1 INDEXADO
 
 typedef struct Nodo{
     int frequencia, chave; //FREQUENCIA E CHAVE: NUMERO DE VEZES QUE A LETRA APARECE E SE VAI SER 1 OU 0 NA TRIE
-    int caminho[29]; //CAMINHO A SER PERCORRIDO NA TRIE PARA ENCONTRAR UMA LETRA
+    int caminho[alpha]; //CAMINHO A SER PERCORRIDO NA TRIE PARA ENCONTRAR UMA LETRA
     char letra; //A LETRA
     struct Nodo *pai, *filhoEsquerdo, *filhoDireito; //CADA NODO TEM UM PAI, UM FILHO ESQUERDO E UM FILHO DIREITO
 }nodo;
-
-int *contaLetra(int *Vetor, char *palavra, int indice){
-    if(palavra[indice] == '\0'){ //SE FOR O FIM DO ARQUIVO
-        Vetor[28]++; //INCREMENTA A FREQUENCIA
-        return Vetor;
-    }
-     else if(palavra[indice] == '\n'){
-        Vetor[27]++; //INCREMENTA A FREQUENCIA
-        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
-    }
-    else if(palavra[indice] == ' '){
-        Vetor[26]++; //INCREMENTA A FREQUENCIA
-        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
-    }
-    else{
-        Vetor[palavra[indice]-97]++; //INCREMENTA A FREQUENCIA
-        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
-    }
-
-}
 
 nodo *criaNodo(int f, char c, int i){
     int j; //VARIAVEL DE ITERAÇAO
     nodo *novo = (nodo*)malloc(sizeof(nodo)); //LIBERANDO A MEMORIA PRO NODO
     novo->frequencia = f; //DEFININDO A FREQUENCIA DO NODO
     novo->chave = 0; //DEFININDO A CHAVE DO NODO
-    for(j=0;j<alpha;j++){ //DEFININDO O VETOR CAMINHO
+    for(j=1;j<alpha;j++){
         if(j==i){
             novo->caminho[i] = 1;
         }
@@ -44,41 +24,6 @@ nodo *criaNodo(int f, char c, int i){
     novo->pai = NULL; //PAI E FILHOS INICIALMENTE VAZIOS, NAS FOLHAS OS FILHOS SEMPRE SERÃO VAZIOS
     novo->filhoEsquerdo = NULL;
     novo->filhoDireito = NULL;
-
-}
-
-nodo **heapfy(nodo **novo, int i, int tam){
-    int j = i;
-    while(2*j < tam){ //ENQUANTO 2*J FOR MENOR QUE O TAMANHO DO 'VETOR'
-        int aux = 2*j;
-        if(aux+1<tam && novo[aux]->frequencia > novo[aux + 1]->frequencia){ //SE AUX + 1 FOR MAIOR QUE O TAMANHO ESTAREMOS VERIFICANDO UMA POSIÇAO INEXISTENTE
-            aux = aux + 1;
-        }
-        if(novo[j]->frequencia <= novo[aux]->frequencia){//SE O ELEMENTO EM J FOR O MENOR, TROQUE J POR TAM E ACABE A ITERAÇAO
-            j = tam;
-        }
-        else{
-            char temp = novo[j]->letra;
-            novo[j]->letra = novo[aux]->letra;  //TROCANDO AS LETRAS DOS 2 NODOS
-            novo[aux]->letra = temp;
-
-            int troca = novo[j]->frequencia;
-            novo[j]->frequencia = novo[aux]->frequencia; //TROCANDO A FREQUENCIA DOS 2 NODOS
-            novo[aux]->frequencia = troca;
-
-            j = aux; //J RECEBE AUX
-        }
-
-    }
-    return novo;
-}
-
-nodo **heap(nodo **novo, int tam){ //USAMOS O NODO E O TAMANHO ATUAL DO 'VETOR'
-    int i;
-    for(i = (tam/2);i>=0;i--){
-        novo = heapfy(novo, i, tam); //FUNCÇAO QUE FARA AS ALTERAÇOES DE POSIÇOES PARA FORMAR UMA MIN-HEAP
-    }
-    return novo;
 }
 
 nodo *criaPai(nodo *aux1, nodo *aux2, nodo *pai){
@@ -92,8 +37,9 @@ nodo *criaPai(nodo *aux1, nodo *aux2, nodo *pai){
     pai->chave = 0; //VALOR INICIAL DA CAHVE
     pai->letra = '+'; //ALTERANDO A LETRA DO PAI
     pai->frequencia = aux1->frequencia + aux2->frequencia;
-    for(j=0;j<alpha;j++){ //DEFININDO O VETOR CAMINHO
+    for(j=1;j<alpha;j++){ //DEFININDO O VETOR CAMINHO
         if(aux1->caminho[j] == 1 || aux2->caminho[j] == 1){
+            //printf("%d ", j);
             pai->caminho[j] = 1;
         }
         else pai->caminho[j] = 0;
@@ -101,24 +47,71 @@ nodo *criaPai(nodo *aux1, nodo *aux2, nodo *pai){
     return pai;
 }
 
-void imprimeBits(nodo *raiz, int i){
-    printf("%d ", raiz->caminho[i]);
-    if(raiz->filhoEsquerdo == NULL && raiz->filhoDireito == NULL){
-        printf(".");
-        return;
-    }
+nodo **heapfy(nodo **novo, int i, int tam){
+    int j = i;
+    while(2*j < tam){ //ENQUANTO 2*J FOR MENOR QUE O TAMANHO DO 'VETOR'
+        int aux = 2*j;
+        if(aux+1<tam && novo[aux]->frequencia > novo[aux + 1]->frequencia){ //SE AUX + 1 FOR MAIOR QUE O TAMANHO ESTAREMOS VERIFICANDO UMA POSIÇAO INEXISTENTE
+            aux = aux + 1;
+        }
+        if(novo[j]->frequencia <= novo[aux]->frequencia){//SE O ELEMENTO EM J FOR O MENOR, TROQUE J POR TAM E ACABE A ITERAÇAO
+            j = tam;
+        }
+        else{
+            nodo *temp;
+            if(novo[j]->letra == '\0'){
+                temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+            }
+            else if(novo[j]->letra == '\n'){
+                temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 28);
+            }
+            else if(novo[j]->letra == ' '){
+                temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 27);
+            }
+            else if(novo[j]->letra == '+'){
+                temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 0);
+                temp = novo[j];
+            }
+            else{
+                temp = criaNodo(novo[j]->frequencia, novo[j]->letra, novo[j]->letra-96);
+            }
 
-    if(raiz->filhoEsquerdo->caminho[i]==1 && raiz->filhoEsquerdo != NULL){
-        printf("CONTINUA");
-        imprimeBits(i, raiz->filhoEsquerdo);
+            novo[j] = novo[aux];
+            novo[aux] = temp;
+
+            j = aux; //J RECEBE AUX
+        }
+
+    }
+    return novo;
+}
+
+nodo **heap(nodo **novo, int tam){ //USAMOS O NODO E O TAMANHO ATUAL DO 'VETOR'
+    int i;
+    for(i = (tam/2);i>=1;i--){
+        novo = heapfy(novo, i, tam); //FUNÇAO QUE FARA AS ALTERAÇOES DE POSIÇOES PARA FORMAR UMA MIN-HEAP
+    }
+    return novo;
+}
+
+int *contaLetra(int *Vetor, char *palavra, int indice){
+    if(palavra[indice] == '\0'){ //SE FOR O FIM DO ARQUIVO
+        Vetor[29]++; //INCREMENTA A FREQUENCIA
+        return Vetor;
+    }
+     else if(palavra[indice] == '\n'){
+        Vetor[28]++; //INCREMENTA A FREQUENCIA
+        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
+    }
+    else if(palavra[indice] == ' '){
+        Vetor[27]++; //INCREMENTA A FREQUENCIA
+        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
     }
     else{
-        if(raiz->filhoDireito->caminho[i]==1 && raiz->filhoDireito != NULL){
-            printf("CONTINUA");
-            imprimeBits(i, raiz->filhoDireito);
-        }
+        Vetor[palavra[indice]-96]++; //INCREMENTA A FREQUENCIA
+        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
     }
-    return;
+
 }
 
 int main(){
@@ -126,81 +119,114 @@ int main(){
     palavra = "dezletrass"; //PALAVRA ALEATORIA
     int i; //VARIAVEL DE ITERAÇAO
     int *frequencia = (int*)malloc(alpha*sizeof(int)); //FREQUENCIA DE CADA LETRA NA STRING PALAVRA
-    for(i=0;i<alpha;i++){
-        frequencia[i] = 0; //DEFININDO CADA POSIÇAO DO VETOR PARA 0
+    for(i=1;i<alpha;i++){
+        frequencia[i]=0; //INICIALMENTE 0
     }
+    frequencia = contaLetra(frequencia, palavra, 0); //CHAMANDO A FUNÇAO QUE IMPLEMENTA A FREQUENCIA -----ATE AQUI TUDO CERTO----
+
 
     nodo **novo = (nodo**)malloc(alpha*sizeof(nodo*)); //CRIANDO A ESTRUTURA DAS FOLHAS
-    frequencia = contaLetra(frequencia, palavra, 0); //CHAMANDO A FUNÇAO QUE IMPLEMENTA A FREQUENCIA
-    for(i=0;i<alpha;i++){ //IMPRIMINDO A TABELA DE FREQUENCIA E CHAMANDO A FUNÇAO QUE CRIA O NODO
-        if(i==28){
+    for(i=1;i<alpha;i++){ //IMPRIMINDO A TABELA DE FREQUENCIA E CRIANDO AS FOLHAS DA TRIE BINARIA
+        if(i==29){
             novo[i] = criaNodo(frequencia[i], '\0', i);
             printf("EOF: %d\n", frequencia[i]);
         }
-        else if(i==27){
+        else if(i==28){
             novo[i] = criaNodo(frequencia[i], '\n', i);
             printf("\\n: %d\n", frequencia[i]);
         }
-        else if(i==26){
+        else if(i==27){
             novo[i] = criaNodo(frequencia[i], ' ', i);
             printf("  : %d\n", frequencia[i]);
         }
         else{
-            novo[i] = criaNodo(frequencia[i], i+97, i);
-            printf("%c: %d\n", i+97, frequencia[i]);
+            novo[i] = criaNodo(frequencia[i], i+96, i);
+            printf("%c: %d\n", i+96, frequencia[i]);
         }
-    }//FIM DA IMPRESSAO DA TABELA DE FREQUENCIA, FOLHAS JA FORAM CRIADAS
-
+    } //FIM DA TABELA, FOLHAS CRIADAS  ----TUDO CERTO ATE AQUI----
     int aux = alpha;
-    while(aux>1){ //AQUI FAREMOS O HEAPFY E TAMBEM A TRIE
-        novo = heap(novo, aux); //CHAMA A FUNÇAO QUE MUDA AS POSIÇOES DAS FOLHAS, DE MODO A DEIXA-LAS EM UMA MIN-HEAP
-        nodo *aux1;
-        if(novo[0]->letra == '\0'){
-            aux1 = criaNodo(novo[0]->frequencia, novo[0]->letra, 28); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+    while(aux>=1){ //AQUI FAREMOS O HEAPFY, TAMBEM MONTAREMOS A TRIE COMPLETA
+        novo = heap(novo, aux); //CHAMA A FUNÇAO QUE MUDA AS POSIÇOES DAS FOLHAS, DE MODO A DEIXA-LAS EM UMA MIN-HEAP ----FUNÇAO HEAPFY RETORNA UMA MIN HEAP----
+        for(i=1;i<aux;i++){
+            printf("%d", novo[i]->frequencia);
+            printf("|");
         }
-        else if(novo[0]->letra == '\0'){
-            aux1 = criaNodo(novo[0]->frequencia, novo[0]->letra, 27);
+        printf("\n");
+        nodo *menor1; //CRIANDO O NODO QUE RECEBERA O MENOR VALOR DA HEAP
+        if(novo[1]->letra == '\0'){
+            menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
         }
-        else if(novo[0]->letra == ' '){
-            aux1 = criaNodo(novo[0]->frequencia, novo[0]->letra, 26);
+        else if(novo[1]->letra == '\n'){
+            menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 28);
+        }
+        else if(novo[1]->letra == ' '){
+            menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 27);
+        }
+        else if(novo[1]->letra == '+'){
+            menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 0);
+            menor1 = novo[1];
         }
         else{
-            aux1 = criaNodo(novo[0]->frequencia, novo[0]->letra, novo[0]->letra-97);
+            menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, novo[1]->letra-96);
         }
-        if(aux1->letra == '\0') printf("EOL ");
-        else if(aux1->letra == '\n') printf("\\n ");
-        else if(aux1->letra == ' ') printf("ESPACO ");
-        else printf("%c, %d", aux1->letra, aux1->frequencia);
-        printf("\n");
-        novo[0] = novo[aux-1]; //SUBSTITUINDO O VALOR JA UTILIZADO POR OUTRO QUE ESTAVA NO FIM DO VETOR
-        aux--; //AGR FAZ EXATAMENTE A MESMA COISA PRA PEGAR A 2 FOLHA
-
-        novo = heap(novo, aux); //CHAMA A FUNÇAO QUE MUDA AS POSIÇOES DAS FOLHAS, DE MODO A DEIXA-LAS EM UMA MIN-HEAP
-        nodo *aux2;
-        if(novo[0]->letra == '\0'){
-            aux2 = criaNodo(novo[0]->frequencia, novo[0]->letra, 28); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
-        }
-        else if(novo[0]->letra == '\0'){
-            aux2 = criaNodo(novo[0]->frequencia, novo[0]->letra, 27);
-        }
-        else if(novo[0]->letra == ' '){
-            aux2 = criaNodo(novo[0]->frequencia, novo[0]->letra, 26);
-        }
-        else{
-            aux2 = criaNodo(novo[0]->frequencia, novo[0]->letra, novo[0]->letra-97);
-        }
-        if(aux2->letra == '\0') printf("EOL ");
-        else if(aux2->letra == '\n') printf("\\n ");
-        else if(aux2->letra == ' ') printf("ESPACO ");
-        else printf("%c, %d", aux2->letra, aux2->frequencia);
-        printf("\n");
-        novo[0] = novo[aux-1]; //SUBSTITUINDO O VALOR JA UTILIZADO POR OUTRO QUE ESTAVA NO FIM DO VETOR
         aux--;
-        novo[aux] = criaPai(aux1, aux2, novo[aux]); //CRIANDO O PAI
-        aux++;
-    }
-    for(i=0;i<alpha;i++){
+        novo[1] = novo[aux]; //SUBSTITUINDO O VALOR JA UTILIZADO POR OUTRO QUE ESTAVA NO FIM DO VETOR
+        //AGR FAZ EXATAMENTE A MESMA COISA PRA PEGAR A 2 FOLHA
 
+        novo = heap(novo, aux); //CHAMA A FUNÇAO QUE MUDA AS POSIÇOES DAS FOLHAS, DE MODO A DEIXA-LAS EM UMA MIN-HEAP ----FUNÇAO HEAPFY RETORNA UMA MIN HEAP----
+        for(i=1;i<aux;i++){
+            printf("%d", novo[i]->frequencia);
+            printf("|");
+        }
+        printf("\n");
+        nodo *menor2; //CRIANDO O NODO QUE RECEBERA O MENOR VALOR DA HEAP
+        if(novo[1]->letra == '\0'){
+            menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+        }
+        else if(novo[1]->letra == '\n'){
+            menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 28);
+        }
+        else if(novo[1]->letra == ' '){
+            menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 27);
+        }
+        else if(novo[1]->letra == '+'){
+            menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 0);
+            menor2 = novo[1];
+        }
+        else{
+            menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, novo[1]->letra-96);
+        }
+        aux--;
+        novo[1] = novo[aux]; //SUBSTITUINDO O VALOR JA UTILIZADO POR OUTRO QUE ESTAVA NO FIM DO VETOR
+        nodo *temp;
+        if(novo[1]->letra == '\0'){
+            temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+        }
+        else if(novo[1]->letra == '\n'){
+            temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 28);
+        }
+        else if(novo[1]->letra == ' '){
+            temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 27);
+        }
+        else if(novo[1]->letra == '+'){
+            temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 0);
+            temp = novo[1];
+        }
+        else{
+            temp = criaNodo(novo[1]->frequencia, novo[1]->letra, novo[1]->letra-96);
+        }
+        novo[aux] = criaPai(menor1, menor2, novo[aux]); //CRIANDO O PAI
+        novo[1] = temp;
+        //printf("CAMINHOS DO PAI: \n");
+        for(i=1;i<alpha;i++){
+            //if(novo[aux]->caminho[i]==1) printf("%d ", i);
+        }
+        printf("\n");
+        aux++;
+        free(menor1);
+        free(menor2);
+        free(temp);
     }
+
     return 0;
 }
