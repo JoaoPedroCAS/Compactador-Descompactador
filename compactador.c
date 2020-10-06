@@ -1,6 +1,7 @@
 #include <stdio.h> //BIBLIOTECA IN E OUT
 #include <stdlib.h> //BIBLIOTECA PADRÃO
 #define alpha 30 //NOSSO ALFABETO TERA 29 ELEMENTOS, DE a À z, ' ', '\n', 'EOF'. 1 INDEXADO
+#define max 1000000
 
 typedef struct Nodo{
     int frequencia, chave; //FREQUENCIA E CHAVE: NUMERO DE VEZES QUE A LETRA APARECE E SE VAI SER 1 OU 0 NA TRIE
@@ -107,6 +108,21 @@ nodo **heap(nodo **novo, int tam){ //USAMOS O NODO E O TAMANHO ATUAL DO 'VETOR'
     return novo;
 }
 
+int imprimeBits(nodo *raiz, int i, int tam, int *Vt){
+    if(raiz->filhoEsquerdo == NULL && raiz->filhoDireito == NULL){
+        Vt[i] = tam;
+        return tam;
+    }
+    if(raiz->filhoEsquerdo->caminho[i] == 1){
+        printf("%d", raiz->filhoEsquerdo->chave);
+        tam += imprimeBits(raiz->filhoEsquerdo, i, tam+1, Vt);
+    }
+    if(raiz->filhoDireito->caminho[i] == 1){
+        printf("%d", raiz->filhoDireito->chave);
+        tam += imprimeBits(raiz->filhoDireito, i, tam+1, Vt);
+    }
+}
+
 int *contaLetra(int *Vetor, char *palavra, int indice){
     if(palavra[indice] == '\0'){ //SE FOR O FIM DO ARQUIVO
         Vetor[29]++; //INCREMENTA A FREQUENCIA
@@ -114,7 +130,7 @@ int *contaLetra(int *Vetor, char *palavra, int indice){
     }
      else if(palavra[indice] == '\n'){
         Vetor[28]++; //INCREMENTA A FREQUENCIA
-        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
+        return Vetor;
     }
     else if(palavra[indice] == ' '){
         Vetor[27]++; //INCREMENTA A FREQUENCIA
@@ -127,34 +143,26 @@ int *contaLetra(int *Vetor, char *palavra, int indice){
 
 }
 
-void imprimeBits(nodo *raiz, int i){
-    if(raiz->filhoEsquerdo == NULL && raiz->filhoDireito == NULL){
-        return;
-    }
-    if(raiz->filhoEsquerdo->caminho[i] == 1){
-        printf("%d", raiz->filhoEsquerdo->chave);
-        imprimeBits(raiz->filhoEsquerdo, i);
-    }
-    if(raiz->filhoDireito->caminho[i] == 1){
-        printf("%d", raiz->filhoDireito->chave);
-        imprimeBits(raiz->filhoDireito, i);
-    }
-    return;
-}
+int main(int argc, char *argv[]){
+    char palavra[max]; //AQUI SERA ARMAZENADO NOSSO VETOR DE CARACTERES DO ARQUIVO TXT
 
-int main(){
-    char *palavra = (char*)malloc(10*sizeof(char)); //LIBERANDO ESPAÇO PRA PALAVRA, NA VERSAO FINAL USAREMOS UM ARQUIVO TXT
-    palavra = "uma frase aleatoria"; //PALAVRA ALEATORIA
-    int i; //VARIAVEL DE ITERAÇAO
+    FILE *file; //DECLARAÇAO PADRAO DO FILE
+    file = fopen(argv[1], "r"); //ABRINDO NO MODO LEITURA O TEXTO DO USUARIO
+    if(file == NULL) return 0; //TRATAMENTO DE ERRO
+    int i; //VARIAVEL DE ITERACAO
     int *frequencia = (int*)malloc(alpha*sizeof(int)); //FREQUENCIA DE CADA LETRA NA STRING PALAVRA
     for(i=1;i<alpha;i++){
         frequencia[i]=0; //INICIALMENTE 0
     }
-    frequencia = contaLetra(frequencia, palavra, 0); //CHAMANDO A FUNÇAO QUE IMPLEMENTA A FREQUENCIA -----ATE AQUI TUDO CERTO----
 
+    while(fgets(palavra, max, file) != NULL){
+        frequencia = contaLetra(frequencia, palavra, 0);
+    }
+    fclose(file);
     nodo **novo = (nodo**)malloc(alpha*sizeof(nodo*)); //CRIANDO A ESTRUTURA DAS FOLHAS
     for(i=1;i<alpha;i++){ //IMPRIMINDO A TABELA DE FREQUENCIA E CRIANDO AS FOLHAS DA TRIE BINARIA
         if(i==29){
+            if(frequencia[i] == 0) frequencia[i]++;
             novo[i] = criaNodo(frequencia[i], '\0', i);
             printf("EOF: %d\n", frequencia[i]);
         }
@@ -282,14 +290,16 @@ int main(){
         aux++;
     } //TRIE CRIADA, TUDO CERTO ATE AQUI
     printf("---\n");
-    int *huffman = (int*)malloc(alpha*sizeof(int));
+    int *tam = (int*)malloc(alpha*sizeof(int));
     for(i=1;i<alpha;i++){
         if(i==29) printf("EOF: ");
         else if(i==28) printf("\\n: ");
         else if(i==27) printf("  : ");
         else printf("%c: ", i+96);
-        imprimeBits(novo[1], i);
+        imprimeBits(novo[1], i, 0, tam);
         printf("\n");
     }
+
+
     return 0;
 }
