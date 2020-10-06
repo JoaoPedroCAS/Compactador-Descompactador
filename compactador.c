@@ -1,4 +1,4 @@
- #include <stdio.h> //BIBLIOTECA IN E OUT
+#include <stdio.h> //BIBLIOTECA IN E OUT
 #include <stdlib.h> //BIBLIOTECA PADRÃO
 #define alpha 30 //NOSSO ALFABETO TERA 29 ELEMENTOS, DE a À z, ' ', '\n', 'EOF'. 1 INDEXADO
 
