@@ -60,19 +60,33 @@ nodo **heapfy(nodo **novo, int i, int tam){
             nodo *temp;
             if(novo[j]->letra == '\0'){
                 temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+                temp->filhoDireito = novo[j]->filhoDireito;
+                temp->filhoEsquerdo = novo[j]->filhoEsquerdo;
             }
             else if(novo[j]->letra == '\n'){
                 temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 28);
+                temp->pai = novo[j]->pai;
+                temp->filhoDireito = novo[j]->filhoDireito;
+                temp->filhoEsquerdo = novo[j]->filhoEsquerdo;
             }
             else if(novo[j]->letra == ' '){
                 temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 27);
+                temp->pai = novo[j]->pai;
+                temp->filhoDireito = novo[j]->filhoDireito;
+                temp->filhoEsquerdo = novo[j]->filhoEsquerdo;
             }
             else if(novo[j]->letra == '+'){
                 temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 0);
-                temp = novo[j];
+                for(i=1;i<alpha;i++) temp->caminho[i] = novo[j]->caminho[i];
+                temp->pai = novo[j]->pai;
+                temp->filhoDireito = novo[j]->filhoDireito;
+                temp->filhoEsquerdo = novo[j]->filhoEsquerdo;
             }
             else{
                 temp = criaNodo(novo[j]->frequencia, novo[j]->letra, novo[j]->letra-96);
+                temp->pai = novo[j]->pai;
+                temp->filhoDireito = novo[j]->filhoDireito;
+                temp->filhoEsquerdo = novo[j]->filhoEsquerdo;
             }
 
             novo[j] = novo[aux];
@@ -115,7 +129,6 @@ int *contaLetra(int *Vetor, char *palavra, int indice){
 
 void imprimeBits(nodo *raiz, int i){
     if(raiz->filhoEsquerdo == NULL && raiz->filhoDireito == NULL){
-        printf(".");
         return;
     }
     if(raiz->filhoEsquerdo->caminho[i] == 1){
@@ -126,11 +139,10 @@ void imprimeBits(nodo *raiz, int i){
         printf("%d", raiz->filhoDireito->chave);
         imprimeBits(raiz->filhoDireito, i);
     }
-
+    return;
 }
 
 int main(){
-    int FTotal = 0;
     char *palavra = (char*)malloc(10*sizeof(char)); //LIBERANDO ESPAÇO PRA PALAVRA, NA VERSAO FINAL USAREMOS UM ARQUIVO TXT
     palavra = "uma frase aleatoria"; //PALAVRA ALEATORIA
     int i; //VARIAVEL DE ITERAÇAO
@@ -139,7 +151,6 @@ int main(){
         frequencia[i]=0; //INICIALMENTE 0
     }
     frequencia = contaLetra(frequencia, palavra, 0); //CHAMANDO A FUNÇAO QUE IMPLEMENTA A FREQUENCIA -----ATE AQUI TUDO CERTO----
-
 
     nodo **novo = (nodo**)malloc(alpha*sizeof(nodo*)); //CRIANDO A ESTRUTURA DAS FOLHAS
     for(i=1;i<alpha;i++){ //IMPRIMINDO A TABELA DE FREQUENCIA E CRIANDO AS FOLHAS DA TRIE BINARIA
@@ -166,20 +177,34 @@ int main(){
         nodo *menor1; //CRIANDO O NODO QUE RECEBERA O MENOR VALOR DA HEAP
         if(novo[1]->letra == '\0'){
             menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+            menor1->pai = novo[1]->pai;
+            menor1->filhoDireito = novo[1]->filhoDireito;
+            menor1->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == '\n'){
             menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 28);
+            menor1->pai = novo[1]->pai;
+            menor1->filhoDireito = novo[1]->filhoDireito;
+            menor1->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == ' '){
             menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 27);
+            menor1->pai = novo[1]->pai;
+            menor1->filhoDireito = novo[1]->filhoDireito;
+            menor1->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == '+'){
             menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 0);
             for(i=1;i<alpha;i++) menor1->caminho[i] = novo[1]->caminho[i];
-            menor1->chave = novo[1]->chave;
+            menor1->pai = novo[1]->pai;
+            menor1->filhoDireito = novo[1]->filhoDireito;
+            menor1->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else{
             menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, novo[1]->letra-96);
+            menor1->pai = novo[1]->pai;
+            menor1->filhoDireito = novo[1]->filhoDireito;
+            menor1->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         aux--;
         novo[1] = novo[aux]; //SUBSTITUINDO O VALOR JA UTILIZADO POR OUTRO QUE ESTAVA NO FIM DO VETOR
@@ -189,49 +214,82 @@ int main(){
         nodo *menor2; //CRIANDO O NODO QUE RECEBERA O MENOR VALOR DA HEAP
         if(novo[1]->letra == '\0'){
             menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+            menor2->pai = novo[1]->pai;
+            menor2->filhoDireito = novo[1]->filhoDireito;
+            menor2->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == '\n'){
             menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 28);
+            menor2->pai = novo[1]->pai;
+            menor2->filhoDireito = novo[1]->filhoDireito;
+            menor2->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == ' '){
             menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 27);
+            menor2->pai = novo[1]->pai;
+            menor2->filhoDireito = novo[1]->filhoDireito;
+            menor2->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == '+'){
             menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 0);
             for(i=1;i<alpha;i++) menor2->caminho[i] = novo[1]->caminho[i];
-            menor2->chave = novo[1]->chave;
+            menor2->pai = novo[1]->pai;
+            menor2->filhoDireito = novo[1]->filhoDireito;
+            menor2->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else{
             menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, novo[1]->letra-96);
+            menor2->pai = novo[1]->pai;
+            menor2->filhoDireito = novo[1]->filhoDireito;
+            menor2->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         aux--;
         novo[1] = novo[aux]; //SUBSTITUINDO O VALOR JA UTILIZADO POR OUTRO QUE ESTAVA NO FIM DO VETOR
         nodo *temp;
         if(novo[1]->letra == '\0'){
             temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+            temp->pai = novo[1]->pai;
+            temp->filhoDireito = novo[1]->filhoDireito;
+            temp->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == '\n'){
             temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 28);
+            temp->pai = novo[1]->pai;
+            temp->filhoDireito = novo[1]->filhoDireito;
+            temp->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == ' '){
             temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 27);
+            temp->pai = novo[1]->pai;
+            temp->filhoDireito = novo[1]->filhoDireito;
+            temp->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else if(novo[1]->letra == '+'){
             temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 0);
             for(i=1;i<alpha;i++) temp->caminho[i] = novo[1]->caminho[i];
-            temp->chave = novo[1]->chave;
+            temp->pai = novo[1]->pai;
+            temp->filhoDireito = novo[1]->filhoDireito;
+            temp->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         else{
             temp = criaNodo(novo[1]->frequencia, novo[1]->letra, novo[1]->letra-96);
+            temp->pai = novo[1]->pai;
+            temp->filhoDireito = novo[1]->filhoDireito;
+            temp->filhoEsquerdo = novo[1]->filhoEsquerdo;
         }
         novo[1] = temp;
         novo[aux] = criaPai(menor1, menor2, novo[aux]); //CRIANDO O PAI
         aux++;
     } //TRIE CRIADA, TUDO CERTO ATE AQUI
     printf("---\n");
+    int *huffman = (int*)malloc(alpha*sizeof(int));
     for(i=1;i<alpha;i++){
-        if(novo[1]->filhoDireito->caminho[i]==1) printf("%d ", i);
-
+        if(i==29) printf("EOF: ");
+        else if(i==28) printf("\\n: ");
+        else if(i==27) printf("  : ");
+        else printf("%c: ", i+96);
+        imprimeBits(novo[1], i);
+        printf("\n");
     }
     return 0;
 }
