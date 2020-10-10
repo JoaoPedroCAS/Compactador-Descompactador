@@ -140,42 +140,242 @@ int *escreveCaminhos(nodo *raiz, int i, int *V, int j){
 }
 
 int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char *argv2, int *tam){
-    int j = 0;
+    int binario = 0, j = 0, k = 0;
+    long int codigo = 0;
     int i = 0;
     int soma = 0;
     int *buffer = (int*)malloc(8*sizeof(int));
     for(i=0;i<8;i++){
         buffer[i]=0;
     }
-    while(palavra[indice] != '\0' || palavra[indice] != '\n'){
+    int tamG;
+    while(palavra[indice] != '\0' && palavra[indice] != '\n'){
         if(palavra[indice] == ' '){
+            tamG = tam[27];
             V = (int*)malloc(tam[27]*sizeof(int));
             for(j=0;j<tam[27];j++){
-                V[i] = 0;
+                V[j] = 0;
             }
             V = escreveCaminhos(raiz, 27, V, 0);
-            soma += tam[i];
+            soma += tam[27];
         }
         else{
+            tamG = tam[palavra[indice]-96];
             V = (int*)malloc(tam[i]*sizeof(int));
-            for(j=0;j<tam[i];j++){
-                V[i] = 0;
+            for(j=0;j<tam[palavra[indice]-96];j++){
+                V[j] = 0;
             }
             V = escreveCaminhos(raiz, palavra[indice]-96, V, 0);
-            soma += tam[i];
+            soma += tam[palavra[indice]-96];
         }
         if(soma==8){
-
+            k = 0;
+            for(j=soma-tamG;j<8;j++){
+                buffer[j] = V[k];
+                k++;
+            }
+            for(j=0;j<8;j++){
+                codigo += buffer[j]*pow(10, soma-j-1); //ESCREVER O CODIGO COMO 1 INT
+            }
+            for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,k);
+            }
+            int hex = binario;
+            e = fopen(argv2, "a");
+            fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
+            fclose(e);
+            soma = 0;
+            codigo = 0;
+            binario = 0;
         }
-        else if(soma<=8){
-            for(j=0;j<soma;j++){
-                buffer[j] = V[j];
+        else if(soma<=7){
+            k = 0;
+            for(j=soma-tamG;j<soma;j++){
+                buffer[j] = V[k];
+                k++;
             }
         }
 
+        else if(soma>=9){
+            k = 0;
+            while(soma>=9){
+                for(j=soma-tamG;j<8;j++){
+                    buffer[j] = V[k];
+                    k++;
+                }
+                for(j=0;j<8;j++){
+                    codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
+                }
+                for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                    int resto = codigo - ((codigo / 10)*10);
+                    codigo = codigo / 10;
+                    binario += resto * pow(2,k);
+                }
+                int hex = binario;
+                e = fopen(argv2, "a");
+                fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
+                fclose(e);
+                soma = soma - 8;
+                codigo = 0;
+                binario = 0;
+            }
+            for(j=0;j<soma;j++){
+                buffer[j] = V[k];
+                k++;
+            }
+        }
         indice++;
     }
-    return V;
+    if(palavra[indice] == '\n'){
+        tamG = tam[28];
+        V = (int*)malloc(tam[28]*sizeof(int));
+        for(j=0;j<tam[28];j++){
+            V[j] = 0;
+        }
+        V = escreveCaminhos(raiz, 28, V, 0);
+        soma += tam[28];
+    }
+
+    if(soma==8){
+            k=0;
+            for(j=soma-tamG;j<8;j++){
+                buffer[j] = V[k];
+                k++;
+            }
+            for(j=0;j<8;j++){
+                codigo += buffer[j]*pow(10, soma-j-1); //ESCREVER O CODIGO COMO 1 INT
+            }
+            for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,k);
+            }
+            int hex = binario;
+            e = fopen(argv2, "a");
+            fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
+            fclose(e);
+            for(i=0;i<8;i++){
+                buffer[i] = 0;
+            }
+            soma = 0;
+            codigo = 0;
+            binario = 0;
+        }
+        else if(soma<=7){
+            k = 0;
+            for(j=soma-tamG;j<soma;j++){
+                buffer[j] = V[k];
+                k++;
+            }
+        }
+
+        else if(soma>=9){
+            k = 0;
+            while(soma>=9){
+                for(j=soma-tamG;j<8;j++){
+                    buffer[j] = V[k];
+                    k++;
+                }
+                for(j=0;j<8;j++){
+                    codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
+                }
+                for (int it=0; it<8; it++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                    int resto = codigo - ((codigo / 10)*10);
+                    codigo = codigo / 10;
+                    binario += resto * pow(2,k);
+                }
+                int hex = binario;
+                e = fopen(argv2, "a");
+                fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
+                fclose(e);
+                soma = soma - 8;
+                codigo = 0;
+                binario = 0;
+            }
+            for(j=0;j<soma;j++){
+                buffer[j] = V[k];
+                k++;
+            }
+        }
+        printf("%d\n", soma);
+        indice++;
+        if(palavra[indice] == '\0'){
+            tamG = tam[29];
+            V = (int*)malloc(tam[28]*sizeof(int));
+            for(j=0;j<tam[29];j++){
+                V[j] = 0;
+            }
+            V = escreveCaminhos(raiz, 29, V, 0);
+            soma += tam[29];
+        }
+        if(soma<=7){
+            k = 0;
+            for(j=soma-tamG;j<soma;j++){
+                buffer[j] = V[k];
+                k++;
+            }
+            for(j=soma;j<8;j++){
+                buffer[j] = 0;
+            }
+            soma = 8;
+        }
+        else if(soma>=9){
+            k = 0;
+            while(soma>=9){
+                for(j=soma-tamG;j<8;j++){
+                    buffer[j] = V[k];
+                    k++;
+                }
+                for(j=0;j<8;j++){
+                    codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
+                }
+                for (int it=0; it<8; it++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                    int resto = codigo - ((codigo / 10)*10);
+                    codigo = codigo / 10;
+                    binario += resto * pow(2,it);
+                }
+                int hex = binario;
+                e = fopen(argv2, "a");
+                fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
+                fclose(e);
+                soma = soma - 8;
+                codigo = 0;
+                binario = 0;
+            }
+            for(j=0;j<soma;j++){
+                buffer[j] = V[k];
+                k++;
+            }
+            for(j=soma;j<8;j++){
+                buffer[j] = 0;
+            }
+            soma = 8;
+        }
+        if(soma==8){
+            k=0;
+            for(j=soma-tamG;j<8;j++){
+                buffer[j] = V[k];
+                k++;
+            }
+            for(j=0;j<8;j++){
+                codigo += buffer[j]*pow(10, soma-j-1); //ESCREVER O CODIGO COMO 1 INT
+            }
+            for (int it=0; it<8; it++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,it);
+            }
+            int hex = binario;
+            e = fopen(argv2, "a");
+            fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
+            fclose(e);
+            soma = 0;
+            codigo = 0;
+            binario = 0;
+        }
+    return buffer;
 }
 
 int *contaLetra(int *Vetor, char *palavra, int indice){
