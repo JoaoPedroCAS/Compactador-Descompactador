@@ -139,6 +139,45 @@ int *escreveCaminhos(nodo *raiz, int i, int *V, int j){
     return V;
 }
 
+int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char *argv2, int *tam){
+    int j = 0;
+    int i = 0;
+    int soma = 0;
+    int *buffer = (int*)malloc(8*sizeof(int));
+    for(i=0;i<8;i++){
+        buffer[i]=0;
+    }
+    while(palavra[indice] != '\0' || palavra[indice] != '\n'){
+        if(palavra[indice] == ' '){
+            V = (int*)malloc(tam[27]*sizeof(int));
+            for(j=0;j<tam[27];j++){
+                V[i] = 0;
+            }
+            V = escreveCaminhos(raiz, 27, V, 0);
+            soma += tam[i];
+        }
+        else{
+            V = (int*)malloc(tam[i]*sizeof(int));
+            for(j=0;j<tam[i];j++){
+                V[i] = 0;
+            }
+            V = escreveCaminhos(raiz, palavra[indice]-96, V, 0);
+            soma += tam[i];
+        }
+        if(soma==8){
+
+        }
+        else if(soma<=8){
+            for(j=0;j<soma;j++){
+                buffer[j] = V[j];
+            }
+        }
+
+        indice++;
+    }
+    return V;
+}
+
 int *contaLetra(int *Vetor, char *palavra, int indice){
     if(palavra[indice] == '\0'){ //SE FOR O FIM DO ARQUIVO
         Vetor[29]++; //INCREMENTA A FREQUENCIA
@@ -528,10 +567,10 @@ int main(int argc, char *argv[]){
     FILE *leitura;
     leitura = fopen(argv[1], "r");
     FILE *escrita;
-    escrita = fopen(argv[2], "a");
+    int *Vetor;
     int j=0;
     while(fgets(palavra, max, leitura) != NULL){
-        //j = escreveLetra(escrita, palavra, novo[1], 0, j);
+        Vetor = escreveLetras(escrita, palavra, novo[1], 0, Vetor, argv[2], tam);
     }
 
     fclose(file);
