@@ -159,6 +159,7 @@ int *contaLetra(int *Vetor, char *palavra, int indice){
 
 }
 
+
 int main(int argc, char *argv[]){
     char palavra[max]; //AQUI SERA ARMAZENADO NOSSO VETOR DE CARACTERES DO ARQUIVO TXT
 
@@ -307,19 +308,19 @@ int main(int argc, char *argv[]){
     } //TRIE CRIADA, TUDO CERTO ATE AQUI
     printf("---\n");
     int *tam = (int*)malloc(alpha*sizeof(int));
-    for(i=1;i<alpha;i++){
+    for(i=1;i<alpha;i++){ //IMPRIMINDO O CODIGO DE HUFFMAN
         if(i==29) printf("EOF: ");
         else if(i==28) printf("\\n: ");
         else if(i==27) printf("  : ");
         else printf("%c: ", i+96);
         imprimeBits(novo[1], i, 0, tam);
         printf("\n");
-    }
+    }//FIM DA IMPRESSAO
 
     FILE *fp;
     fp = fopen(argv[2], "w");
     fclose(fp);
-    for(i=1;i<alpha;i++){
+    for(i=1;i<alpha;i++){ //COMEÇANDO A ARMAZENAR O CABEÇALHO
         unsigned char hex;
         int j=0;
         int codigo = 0;
@@ -332,25 +333,25 @@ int main(int argc, char *argv[]){
         fwrite(&hex, 1, sizeof(unsigned char), fp);
         fclose(fp);
         V = escreveCaminhos(novo[1], i, V, 0);
-        if(tam[i]>0 && tam[i]<=8){
+        if(tam[i]>0 && tam[i]<=8){ // CASO O "TAMANHO" DO VETOR SEJA DE NO MAXIMO 1 BYTE
             for(j=0;j<tam[i];j++){
-                codigo += V[j]*pow(10, tam[i]-j-1);
+                codigo += V[j]*pow(10, tam[i]-j-1); //ESCREVER O CODIGO COMO 1 INT
             }
-            while(j!=8){
+            while(j!=8){ //AJUSTANDO O TAMNHO PARA 1 BYTE
                 codigo *= 10;
                 j++;
             }
             int binario = 0;
-            for (int k = 0; k < 8; k++) {
+            for (int k = 0; k < 8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
                 int resto = codigo - ((codigo / 10)*10);
                 codigo = codigo / 10;
                 binario += resto * pow(2,k);
             }
             hex = binario;
             fp = fopen(argv[2], "a");
-            fwrite(&hex, 1, sizeof(unsigned char), fp);
-            fclose(fp);
-            for(j=0;j<3;j++){
+            fwrite(&hex, 1, sizeof(unsigned char), fp); //ESCREVENDO O BINARIO NO ARQUIVO
+            fclose(fp); //FECHA ARQUIVO
+            for(j=0;j<3;j++){ //ESCREVENDO A SEQUENCIA DE 0
                 fp = fopen(argv[2], "a");
                 hex = 0;
                 fwrite(&hex, 1, sizeof(unsigned char), fp);
@@ -358,27 +359,29 @@ int main(int argc, char *argv[]){
             }
 
         }
-        else if(tam[i]>8 && tam[i]<=16){
-            for(j=0;j<tam[i];j++){
-                codigo += V[j]*pow(10, tam[i]-j-1);
+        else if(tam[i]>8 && tam[i]<=16){ // CASO O "TAMANHO" SEJA DE NO MAXIMO 2 BYTES
+            for(j=0;j<8;j++){
+                codigo += V[j]*pow(10, 8-j-1);
             }
             int binario = 0;
-            printf("%d", codigo);
-            printf("\n");
-            for (int k = 0; k < 8; k++) {
+            for(int k = 0; k < 8; k++) {
                 int resto = codigo - ((codigo / 10)*10);
                 codigo = codigo / 10;
                 binario += resto * pow(2,k);
-            }
-            while(j!=16){
-                codigo *= 10;
-                j++;
             }
             hex = binario;
             fp = fopen(argv[2], "a");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
+            codigo = 0;
             binario = 0;
+            for(j=8;j<tam[i];j++){
+                codigo += V[j]*pow(10, tam[i]-j-1);
+            }
+            while(j!=16){
+                codigo *=10;
+                j++;
+            }
             for (int k = 0; k < 8; k++) {
                 int resto = codigo - ((codigo / 10)*10);
                 codigo = codigo / 10;
@@ -397,44 +400,55 @@ int main(int argc, char *argv[]){
             }
 
         }
-        else if(tam[i]>16 && tam[i]<=24){
-            for(j=0;j<tam[i];j++){
+        else if(tam[i]>16 && tam[i]<=24){ //CASO O "TAMANHO" SEJA DE NO MAXIMO 3 BYTES
+            for(j=0;j<8;j++){
+                codigo += V[j]*pow(10, 8-j-1);
+            }
+            int binario = 0;
+            for (int k = 0; k < 8; k++) {
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,k);
+            }
+            hex = binario;
+            fp = fopen(argv[2], "a");
+            fwrite(&hex, 1, sizeof(unsigned char), fp);
+            fclose(fp);
+            binario = 0;
+            codigo = 0;
+
+            for(j=8;j<16;j++){
+                codigo += V[j]*pow(10, 16-j-1);
+            }
+            for (int k = 0; k < 8; k++) {
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,k);
+            }
+            hex = binario;
+            fp = fopen(argv[2], "a");
+            fwrite(&hex, 1, sizeof(unsigned char), fp);
+            fclose(fp);
+            binario = 0;
+            codigo = 0;
+
+            for(j=16;j<tam[i];j++){
                 codigo += V[j]*pow(10, tam[i]-j-1);
             }
             while(j!=24){
                 codigo *= 10;
                 j++;
             }
-            int binario = 0;
-            for (int k = 0; k < j/3; k++) {
+            for (int k = 0; k < 8; k++) {
                 int resto = codigo - ((codigo / 10)*10);
                 codigo = codigo / 10;
-                 binario += resto * pow(2,k);
+                binario += resto * pow(2,k);
             }
             hex = binario;
             fp = fopen(argv[2], "a");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
             binario = 0;
-            for (int k = j/3; k < j/2; k++) {
-                int resto = codigo - ((codigo / 10)*10);
-                codigo = codigo / 10;
-                 binario += resto * pow(2,k);
-            }
-            hex = binario;
-            fp = fopen(argv[2], "a");
-            fwrite(&hex, 1, sizeof(unsigned char), fp);
-            fclose(fp);
-            binario = 0;
-            for (int k = j/2; k < j; k++) {
-                int resto = codigo - ((codigo / 10)*10);
-                codigo = codigo / 10;
-                 binario += resto * pow(2,k);
-            }
-            hex = binario;
-            fp = fopen(argv[2], "a");
-            fwrite(&hex, 1, sizeof(unsigned char), fp);
-            fclose(fp);
 
             for(j=0;j<1;j++){
                 fp = fopen(argv[2], "a");
@@ -444,46 +458,12 @@ int main(int argc, char *argv[]){
             }
 
         }
-        else if(tam[i]>24 && tam[i]<=32){
-            for(j=0;j<tam[i];j++){
-                codigo += V[j]*pow(10, tam[i]-j-1);
-            }
-            while(j!=32){
-                codigo *= 10;
-                j++;
+        else if(tam[i]>24 && tam[i]<=32){ //CASO O "TAMANHO" SEJA DE NO MAXIMO 4 BYTES
+            for(j=0;j<8;j++){
+                codigo += V[j]*pow(10, 8-j-1);
             }
             int binario = 0;
-            for (int k = 0; k < j/4; k++) {
-                int resto = codigo - ((codigo / 10)*10);
-                codigo = codigo / 10;
-                 binario += resto * pow(2,k);
-            }
-            hex = binario;
-            fp = fopen(argv[2], "a");
-            fwrite(&hex, 1, sizeof(unsigned char), fp);
-            fclose(fp);
-            binario = 0;
-            for (int k = j/4; k < j/3; k++) {
-                int resto = codigo - ((codigo / 10)*10);
-                codigo = codigo / 10;
-                 binario += resto * pow(2,k);
-            }
-            hex = binario;
-            fp = fopen(argv[2], "a");
-            fwrite(&hex, 1, sizeof(unsigned char), fp);
-            fclose(fp);
-            binario = 0;
-            for (int k = j/3; k < j/2; k++) {
-                int resto = codigo - ((codigo / 10)*10);
-                codigo = codigo / 10;
-                 binario += resto * pow(2,k);
-            }
-            hex = binario;
-            fp = fopen(argv[2], "a");
-            fwrite(&hex, 1, sizeof(unsigned char), fp);
-            fclose(fp);
-            binario = 0;
-            for (int k = j/2; k < j; k++) {
+            for (int k = 0; k < 8; k++) {
                 int resto = codigo - ((codigo / 10)*10);
                 codigo = codigo / 10;
                 binario += resto * pow(2,k);
@@ -492,7 +472,68 @@ int main(int argc, char *argv[]){
             fp = fopen(argv[2], "a");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
+            binario = 0;
+            codigo = 0;
+
+            for(j=8;j<16;j++){
+                codigo += V[j]*pow(10, 16-j-1);
+            }
+            for (int k = 0; k < 8; k++) {
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,k);
+            }
+            hex = binario;
+            fp = fopen(argv[2], "a");
+            fwrite(&hex, 1, sizeof(unsigned char), fp);
+            fclose(fp);
+            binario = 0;
+            codigo = 0;
+
+            for(j=16;j<24;j++){
+                codigo += V[j]*pow(10, 24-j-1);
+            }
+            for (int k = 0; k < 8; k++) {
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,k);
+            }
+            hex = binario;
+            fp = fopen(argv[2], "a");
+            fwrite(&hex, 1, sizeof(unsigned char), fp);
+            fclose(fp);
+            binario = 0;
+            codigo =0;
+            for(j=24; j<tam[i];j++){
+                codigo += V[j]*pow(10, tam[i]-j-1);
+            }
+            while(j!=32){
+                codigo *= 10;
+                j++;
+            }
+            for(int k=0; k<8;k++){
+                int resto = codigo -((codigo/10)*10);
+                codigo = codigo/10;
+                binario += resto * pow(2,k);
+            }
+            hex = binario;
+            fp = fopen(argv[2], "a");
+            fwrite(&hex, 1, sizeof(unsigned char), fp);
+            fclose(fp);
+            binario = 0;
+            codigo =0;
         }
+    } //FIM DO CABEÇALHO
+
+    FILE *leitura;
+    leitura = fopen(argv[1], "r");
+    FILE *escrita;
+    escrita = fopen(argv[2], "a");
+    int j=0;
+    while(fgets(palavra, max, leitura) != NULL){
+        //j = escreveLetra(escrita, palavra, novo[1], 0, j);
     }
+
+    fclose(file);
     return 0;
 }
