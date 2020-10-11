@@ -304,10 +304,6 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
             }
         }
     }
-
-
-        //printf("%d\n", soma);
-        //indice++;
     buffer[7] = soma;
     return buffer;
 }
@@ -766,7 +762,21 @@ int main(int argc, char *argv[]){
         for(j=soma;j<8;j++){
             buffer[j] = 0;
         }
-        soma = 8;
+        for(j=0;j<8;j++){
+                codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
+            }
+            for (int it=0; it<8; it++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,it);
+            }
+            int hex = binario;
+            escrita = fopen(argv[2], "a");
+            fwrite(&hex, 1, sizeof(unsigned char), escrita); //ESCREVENDO O BINARIO NO ARQUIVO
+            fclose(escrita);
+            soma = soma - 8;
+            codigo = 0;
+            binario = 0;
     }
     if(soma==8){
         k=0;
