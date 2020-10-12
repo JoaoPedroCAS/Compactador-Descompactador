@@ -93,11 +93,11 @@ nodo **heapfy(nodo **novo, int i, int tam){
 
             novo[j] = novo[aux];
             novo[aux] = temp;
-
             j = aux; //J RECEBE AUX
         }
-
     }
+
+
     return novo;
 }
 
@@ -488,23 +488,20 @@ int main(int argc, char *argv[]){
 
     FILE *fp;
     fp = fopen(argv[2], "w");
-    unsigned char hex = 10;
-    fwrite(&hex, 1, 1, fp);
-    fclose(fp);
+    unsigned char hex = 0;
     for(i=1;i<30;i++){ //COMEÇANDO A ARMAZENAR O CABEÇALHO
         int j=0;
         int codigo = 0;
         hex = tam[i];
         fp = fopen(argv[2], "a");
-        if (hex == 10) hex = 9;
-        //fwrite(&hex, 1, sizeof(unsigned char), fp);
-        //fclose(fp);
+        fwrite(&hex, 1, sizeof(unsigned char), fp);
+        fclose(fp);
         hex = 0;
         int *V = (int*)malloc(tam[i]*sizeof(int));
         for(int j=0;j<tam[i];j++){
             V[j] = 0;
         }
-    /*    V = escreveCaminhos(novo[1], i, V, 0);
+        V = escreveCaminhos(novo[1], i, V, 0);
         if(tam[i]>0 && tam[i]<=8){ // CASO O "TAMANHO" DO VETOR SEJA DE NO MAXIMO 1 BYTE
             for(j=0;j<tam[i];j++){
                 codigo += V[j]*pow(10, tam[i]-j-1); //ESCREVER O CODIGO COMO 1 INT
@@ -695,19 +692,18 @@ int main(int argc, char *argv[]){
             binario = 0;
             codigo =0;
         }
-    */}
-     //FIM DO CABEÇALHO
+    } //FIM DO CABEÇALHO
 
-    /*FILE *leitura;
+    FILE *leitura;
     leitura = fopen(argv[1], "r");
     FILE *escrita;
     int *Vetor = (int*)malloc(8*sizeof(int));
     for(i=0;i<8;i++) Vetor[i] = 0;
-    int j=0;*/
-    /*while(fgets(palavra, max, leitura) != NULL){ //ARAMAZENANDO O ARQUIVO COMPRIMIDO
+    int j=0;
+    while(fgets(palavra, max, leitura) != NULL){ //ARAMAZENANDO O ARQUIVO COMPRIMIDO
         Vetor = escreveLetras(escrita, palavra, novo[1], 0, Vetor, argv[2], tam);
-    }*/
-    /*int *buffer = (int*)malloc(8*sizeof(int));
+    }
+    int *buffer = (int*)malloc(8*sizeof(int));
     for(i=0;i<8;i++){
         buffer[i] = 0;
     }
@@ -803,8 +799,7 @@ int main(int argc, char *argv[]){
         soma = 0;
         codigo = 0;
         binario = 0;
-    }*/
-
-    //fclose(leitura);
+    }
+    fclose(leitura);
     return 0;
 }
