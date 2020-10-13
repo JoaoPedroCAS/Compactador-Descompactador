@@ -189,7 +189,7 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
                 binario += resto * pow(2,k);
             }
             int hex = binario;
-            e = fopen(argv2, "a");
+            e = fopen(argv2, "ab");
             fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
             fclose(e);
             soma = 0;
@@ -220,7 +220,7 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
                     binario += resto * pow(2,k);
                 }
                 int hex = binario;
-                e = fopen(argv2, "a");
+                e = fopen(argv2, "ab");
                 fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
                 fclose(e);
                 soma = soma - 8;
@@ -257,7 +257,7 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
                 binario += resto * pow(2,k);
             }
             int hex = binario;
-            e = fopen(argv2, "a");
+            e = fopen(argv2, "ab");
             fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
             fclose(e);
             for(i=0;i<8;i++){
@@ -285,13 +285,13 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
                 for(j=0;j<8;j++){
                     codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
                 }
-                for (int it=0; it<8; it++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
                     int resto = codigo - ((codigo / 10)*10);
                     codigo = codigo / 10;
                     binario += resto * pow(2,k);
                 }
                 int hex = binario;
-                e = fopen(argv2, "a");
+                e = fopen(argv2, "ab");
                 fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
                 fclose(e);
                 soma = soma - 8;
@@ -328,6 +328,12 @@ int *contaLetra(int *Vetor, char *palavra, int indice){
 
 }
 
+/*void freeTrie(nodo *raiz){
+    if(raiz==NULL)return;
+    freeTrie(raiz->filhoDireito);
+    freeTrie(raiz->filhoEsquerdo);
+    free(raiz);
+}*/
 
 int main(int argc, char *argv[]){
     char palavra[max]; //AQUI SERA ARMAZENADO NOSSO VETOR DE CARACTERES DO ARQUIVO TXT
@@ -487,13 +493,13 @@ int main(int argc, char *argv[]){
     }//FIM DA IMPRESSAO
 
     FILE *fp;
-    fp = fopen(argv[2], "w");
+    fp = fopen(argv[2], "wb");
     unsigned char hex = 0;
     for(i=1;i<30;i++){ //COMEÇANDO A ARMAZENAR O CABEÇALHO
         int j=0;
         int codigo = 0;
         hex = tam[i];
-        fp = fopen(argv[2], "a");
+        fp = fopen(argv[2], "ab");
         fwrite(&hex, 1, sizeof(unsigned char), fp);
         fclose(fp);
         hex = 0;
@@ -517,11 +523,11 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp); //ESCREVENDO O BINARIO NO ARQUIVO
             fclose(fp); //FECHA ARQUIVO
             for(j=0;j<3;j++){ //ESCREVENDO A SEQUENCIA DE 0
-                fp = fopen(argv[2], "a");
+                fp = fopen(argv[2], "ab");
                 hex = 0;
                 fwrite(&hex, 1, sizeof(unsigned char), fp);
                 fclose(fp);
@@ -539,7 +545,7 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
             codigo = 0;
@@ -557,12 +563,12 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
 
             for(j=0;j<2;j++){
-                fp = fopen(argv[2], "a");
+                fp = fopen(argv[2], "ab");
                 hex = 0;
                 fwrite(&hex, 1, sizeof(unsigned char), fp);
                 fclose(fp);
@@ -580,7 +586,7 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
             binario = 0;
@@ -595,7 +601,7 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
             binario = 0;
@@ -620,7 +626,7 @@ int main(int argc, char *argv[]){
             binario = 0;
 
             for(j=0;j<1;j++){
-                fp = fopen(argv[2], "a");
+                fp = fopen(argv[2], "ab");
                 hex = 0;
                 fwrite(&hex, 1, sizeof(unsigned char), fp);
                 fclose(fp);
@@ -638,7 +644,7 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
             binario = 0;
@@ -653,7 +659,7 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
             binario = 0;
@@ -668,7 +674,7 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
             binario = 0;
@@ -686,12 +692,13 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             hex = binario;
-            fp = fopen(argv[2], "a");
+            fp = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), fp);
             fclose(fp);
             binario = 0;
             codigo =0;
         }
+        free(V);
     } //FIM DO CABEÇALHO
 
     FILE *leitura;
@@ -715,6 +722,7 @@ int main(int argc, char *argv[]){
         }
     }
     int tamG = tam[29];
+    free(Vetor);
     Vetor = (int*)malloc(tam[29]*sizeof(int));
     for(j=0;j<tam[29];j++){
         Vetor[j] = 0;
@@ -742,13 +750,13 @@ int main(int argc, char *argv[]){
             for(j=0;j<8;j++){
                 codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
             }
-            for (int it=0; it<8; it++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+            for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
                 int resto = codigo - ((codigo / 10)*10);
                 codigo = codigo / 10;
-                binario += resto * pow(2,it);
+                binario += resto * pow(2,k);
             }
             int hex = binario;
-            escrita = fopen(argv[2], "a");
+            escrita = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), escrita); //ESCREVENDO O BINARIO NO ARQUIVO
             fclose(escrita);
             soma = soma - 8;
@@ -765,13 +773,13 @@ int main(int argc, char *argv[]){
         for(j=0;j<8;j++){
                 codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
             }
-            for (int it=0; it<8; it++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+            for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
                 int resto = codigo - ((codigo / 10)*10);
                 codigo = codigo / 10;
-                binario += resto * pow(2,it);
+                binario += resto * pow(2,k);
             }
             int hex = binario;
-            escrita = fopen(argv[2], "a");
+            escrita = fopen(argv[2], "ab");
             fwrite(&hex, 1, sizeof(unsigned char), escrita); //ESCREVENDO O BINARIO NO ARQUIVO
             fclose(escrita);
             soma = soma - 8;
@@ -787,13 +795,13 @@ int main(int argc, char *argv[]){
         for(j=0;j<8;j++){
             codigo += buffer[j]*pow(10, soma-j-1); //ESCREVER O CODIGO COMO 1 INT
         }
-        for (int it=0; it<8; it++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+        for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
             int resto = codigo - ((codigo / 10)*10);
             codigo = codigo / 10;
-            binario += resto * pow(2,it);
+            binario += resto * pow(2,k);
         }
         int hex = binario;
-        escrita = fopen(argv[2], "a");
+        escrita = fopen(argv[2], "ab");
         fwrite(&hex, 1, sizeof(unsigned char), escrita); //ESCREVENDO O BINARIO NO ARQUIVO
         fclose(escrita);
         soma = 0;
@@ -801,5 +809,13 @@ int main(int argc, char *argv[]){
         binario = 0;
     }
     fclose(leitura);
+    free(frequencia);
+    free(tam);
+    free(Vetor);
+    free(buffer);
+    //for(i=0;i<alpha;i++){
+        //freeTrie(novo[i]);
+    //}
+    printf("FIM!\n");
     return 0;
 }
