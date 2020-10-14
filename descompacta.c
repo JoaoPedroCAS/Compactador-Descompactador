@@ -22,53 +22,47 @@ int *conversaoBinario(int *binario, int decimal){
 
 nodo *criaNodo(char letra){
     nodo *novo = (nodo*)malloc(sizeof(nodo));
-    novo->letra = '+';
+    novo->letra = letra;
     novo->filhoDireito = NULL;
     novo->filhoEsquerdo = NULL;
 }
 
 nodo *criaArvore(nodo *raiz, int *caminho, int tam, int letra, int iteracao){
-    printf("%c\n", raiz->letra);
-    if(iteracao == tam) return NULL;
+    if(iteracao == tam) return raiz;
     if(caminho[iteracao] == 1){
-        if(raiz->filhoDireito != NULL) raiz->filhoDireito = criaArvore(raiz->filhoDireito, caminho, tam, letra, iteracao+1);
-        else{
+        if(raiz->filhoDireito == NULL){
             if(iteracao == tam-1){
                 if(letra == 26) raiz->filhoDireito = criaNodo(' ');
                 else if(letra == 27) raiz->filhoDireito = criaNodo('\n');
                 else if(letra == 28) raiz->filhoDireito = criaNodo(0);
                 else raiz->filhoDireito = criaNodo(letra+97);
-                raiz->filhoDireito = criaArvore(raiz->filhoDireito, caminho, tam, letra, iteracao+1);
             }
             else{
                 raiz->filhoDireito = criaNodo('+');
-                raiz->filhoDireito = criaArvore(raiz->filhoDireito, caminho, tam, letra, iteracao+1);
             }
         }
+        raiz->filhoDireito = criaArvore(raiz->filhoDireito, caminho, tam, letra, iteracao+1);
     }
-    if(caminho[iteracao] == 0){
-        if(raiz->filhoEsquerdo != NULL) raiz->filhoEsquerdo = criaArvore(raiz->filhoEsquerdo, caminho, tam, letra, iteracao+1);
-        else{
+    else{
+        if(raiz->filhoEsquerdo == NULL){
             if(iteracao == tam-1){
                 if(letra == 26) raiz->filhoEsquerdo = criaNodo(' ');
                 else if(letra == 27) raiz->filhoEsquerdo = criaNodo('\n');
                 else if(letra == 28) raiz->filhoEsquerdo = criaNodo(0);
                 else raiz->filhoEsquerdo = criaNodo(letra+97);
-                raiz->filhoEsquerdo = criaArvore(raiz->filhoEsquerdo, caminho, tam, letra, iteracao+1);
             }
             else{
                 raiz->filhoEsquerdo = criaNodo('+');
-                raiz->filhoEsquerdo = criaArvore(raiz->filhoEsquerdo, caminho, tam, letra, iteracao+1);
             }
         }
+        raiz->filhoEsquerdo = criaArvore(raiz->filhoEsquerdo, caminho, tam, letra, iteracao+1);
     }
     return raiz;
 }
 
-void escreveTxt(nodo *raiz, int *bin, FILE *e, char *argv2){
+int *escreveTxt(nodo *raiz, int *bin, FILE *e, char *argv2, int tam){
     int i = 0;
-    while(raiz != NULL){
-        //printf("%d", bin[i]);
+    while(raiz->letra == '+'){
         if(bin[i] == 1){
             i++;
             raiz = raiz->filhoDireito;
@@ -78,8 +72,9 @@ void escreveTxt(nodo *raiz, int *bin, FILE *e, char *argv2){
             raiz = raiz->filhoEsquerdo;
         }
     }
-    //e = fopen(argv2, "a");
-    //fprintf(e, "%c", raiz->letra);
+    e = fopen(argv2, "a");
+    fprintf(e, "%c", raiz->letra);
+    fclose(e);
 }
 
 int main(int argc, char* argv[]){
@@ -114,7 +109,6 @@ int main(int argc, char* argv[]){
                     printf("%d", bin[j]);
                 }
             }
-
             raiz = criaArvore(raiz, bin, tam, i, 0);
             aux++;
         }
@@ -130,7 +124,7 @@ int main(int argc, char* argv[]){
         int *bin = (int*)malloc(8*sizeof(int));
         int decimal = bytes[aux];
         bin = conversaoBinario(bin, decimal);
-        escreveTxt(raiz, bin, escrita, argv[2]);
+        bin = escreveTxt(raiz, bin, escrita, argv[2], 8);
         break;
     }
 
