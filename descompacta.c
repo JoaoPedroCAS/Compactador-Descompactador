@@ -60,21 +60,38 @@ nodo *criaArvore(nodo *raiz, int *caminho, int tam, int letra, int iteracao){
     return raiz;
 }
 
-int *escreveTxt(nodo *raiz, int *bin, FILE *e, char *argv2, int tam){
+int *escreveTxt(nodo *raiz, int *bin, FILE *e, char *argv2, int tam, int aux, unsigned char *bytes){
     int i = 0;
-    while(raiz->letra == '+'){
-        if(bin[i] == 1){
+    int decimal = bytes[aux];
+    bin = conversaoBinario(bin, decimal);
+    nodo *temp = raiz;
+    while(raiz->letra != 0){
+        if(raiz->letra != '+' && i<8){
+            //printf("%d\n", decimal);
+            e = fopen(argv2, "a");
+            fprintf(e, "%c", raiz->letra);
+            fclose(e);
+            raiz = temp;
+        }
+        if(i==8){
+            aux++;
+            decimal = bytes[aux];
+            bin = conversaoBinario(bin, decimal);
+            i=0;
+        }
+        else if(bin[i] == 1 && i<8){
+            //printf("%d ", bin[i]);
             i++;
             raiz = raiz->filhoDireito;
         }
-        else{
+        else if(bin[i]==0 && i<8){
+            //printf("%d ", bin[i]);
             i++;
             raiz = raiz->filhoEsquerdo;
+            if(raiz==NULL) printf("BUGOU");
         }
     }
-    e = fopen(argv2, "a");
-    fprintf(e, "%c", raiz->letra);
-    fclose(e);
+    //printf("%d", raiz->letra);
 }
 
 int main(int argc, char* argv[]){
@@ -90,29 +107,60 @@ int main(int argc, char* argv[]){
         else if(i == 27)printf("\\n: ");
         else if(i == 28)printf("EOF: ");
         else printf("%c: ", i+97);
-        j=0;
         int aux = (i*5)+1;
-        int *bin = (int*)malloc(8*sizeof(int));
         int tam = bytes[i*5];
-        while(j < tam){
-            int decimal = bytes[aux];
-            bin = conversaoBinario(bin, decimal);
-            if(tam>8){
-                for(j=0;j<8;j++){
-                    printf("%d", bin[j]);
+        int j = 0;
+        while(j<tam){
+            if(tam>0 && tam <=8){
+                int *buffer = (int*)malloc(tam*sizeof(int));
+                int *bin = (int*)malloc(8*sizeof(int));
+                int decimal = bytes[aux];
+                for(int k=0;k<8;k++){
+                    if(decimal%2 == 0) bin[k] = 0;
+                    else bin[k] = 1;
+                    decimal = decimal/2;
                 }
-                j=0;
-                tam = tam - 8;
-            }
-            else{
-                for(j=0;j<tam;j++){
-                    printf("%d", bin[j]);
+                for(int k=0;k<tam;k++){
+                    buffer[k] = bin[7-k];
+                    printf("%d", buffer[k]);
                 }
+                j=8;
+                raiz = criaArvore(raiz, buffer, tam, i, 0);
+                free(bin);
+                free(buffer);
             }
-            raiz = criaArvore(raiz, bin, tam, i, 0);
-            aux++;
+            else if(tam>8 && tam<=16){
+                int *buffer = (int*)malloc(tam*sizeof(int));
+                int *bin = (int*)malloc(8*sizeof(int));
+                int decimal = bytes[aux];
+                for(int k=0;k<8;k++){
+                    if(decimal%2 == 0) bin[k] = 0;
+                    else bin[k] = 1;
+                    decimal = decimal/2;
+                }
+                for(int k=0;k<8;k++){
+                    buffer[k] = bin[7-k];
+                    printf("%d", buffer[k]);
+                }
+                aux++;
+                decimal = bytes[aux];
+                for(int k=0;k<8;k++){
+                    if(decimal%2 == 0) bin[k] = 0;
+                    else bin[k] = 1;
+                    decimal = decimal/2;
+                }
+                j = 7;
+                for(int k=8;k<tam;k++){
+                    buffer[k] = bin[j];
+                    j--;
+                    printf("%d", buffer[k]);
+                }
+                j=16;
+                raiz = criaArvore(raiz, buffer, tam, i, 0);
+                free(bin);
+                free(buffer);
+            }
         }
-        free(bin);
         printf("\n");
     }
     int aux = i*5;
@@ -122,9 +170,7 @@ int main(int argc, char* argv[]){
     fclose(escrita);
     while(letra != 0){
         int *bin = (int*)malloc(8*sizeof(int));
-        int decimal = bytes[aux];
-        bin = conversaoBinario(bin, decimal);
-        bin = escreveTxt(raiz, bin, escrita, argv[2], 8);
+        bin = escreveTxt(raiz, bin, escrita, argv[2], 8, aux, bytes);
         break;
     }
 
