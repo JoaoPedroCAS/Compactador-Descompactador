@@ -25,6 +25,7 @@ nodo *criaNodo(char letra){
     novo->letra = letra;
     novo->filhoDireito = NULL;
     novo->filhoEsquerdo = NULL;
+    return novo;
 }
 
 nodo *criaArvore(nodo *raiz, int *caminho, int tam, int letra, int iteracao){
@@ -34,7 +35,7 @@ nodo *criaArvore(nodo *raiz, int *caminho, int tam, int letra, int iteracao){
             if(iteracao == tam-1){
                 if(letra == 26) raiz->filhoDireito = criaNodo(' ');
                 else if(letra == 27) raiz->filhoDireito = criaNodo('\n');
-                else if(letra == 28) raiz->filhoDireito = criaNodo(0);
+                else if(letra == 28) raiz->filhoDireito = criaNodo(-1);
                 else raiz->filhoDireito = criaNodo(letra+97);
             }
             else{
@@ -48,7 +49,7 @@ nodo *criaArvore(nodo *raiz, int *caminho, int tam, int letra, int iteracao){
             if(iteracao == tam-1){
                 if(letra == 26) raiz->filhoEsquerdo = criaNodo(' ');
                 else if(letra == 27) raiz->filhoEsquerdo = criaNodo('\n');
-                else if(letra == 28) raiz->filhoEsquerdo = criaNodo(0);
+                else if(letra == 28) raiz->filhoEsquerdo = criaNodo(-1);
                 else raiz->filhoEsquerdo = criaNodo(letra+97);
             }
             else{
@@ -60,14 +61,13 @@ nodo *criaArvore(nodo *raiz, int *caminho, int tam, int letra, int iteracao){
     return raiz;
 }
 
-int *escreveTxt(nodo *raiz, int *bin, FILE *e, char *argv2, int tam, int aux, unsigned char *bytes){
+void escreveTxt(nodo *raiz, int *bin, FILE *e, char *argv2, int tam, int aux, unsigned char *bytes, int total){
     int i = 0;
     int decimal = bytes[aux];
     bin = conversaoBinario(bin, decimal);
     nodo *temp = raiz;
-    while(raiz->letra != 0){
+    while(aux<total && raiz->letra != -1){
         if(raiz->letra != '+' && i<8){
-            //printf("%d\n", decimal);
             e = fopen(argv2, "a");
             fprintf(e, "%c", raiz->letra);
             fclose(e);
@@ -88,14 +88,13 @@ int *escreveTxt(nodo *raiz, int *bin, FILE *e, char *argv2, int tam, int aux, un
             //printf("%d ", bin[i]);
             i++;
             raiz = raiz->filhoEsquerdo;
-            if(raiz==NULL) printf("BUGOU");
         }
     }
     //printf("%d", raiz->letra);
 }
 
 int main(int argc, char* argv[]){
-    int i, j = 0;
+    int i;
     FILE *leitura;
     nodo *raiz = NULL;
     raiz = criaNodo('+');
@@ -164,15 +163,11 @@ int main(int argc, char* argv[]){
         printf("\n");
     }
     int aux = i*5;
-    char letra = 'a';
     FILE *escrita;
     escrita = fopen(argv[2], "w");
     fclose(escrita);
-    while(letra != 0){
-        int *bin = (int*)malloc(8*sizeof(int));
-        bin = escreveTxt(raiz, bin, escrita, argv[2], 8, aux, bytes);
-        break;
-    }
+    int *bin = (int*)malloc(8*sizeof(int));
+    escreveTxt(raiz, bin, escrita, argv[2], 8, aux, bytes, total);
 
     return 0;
 }

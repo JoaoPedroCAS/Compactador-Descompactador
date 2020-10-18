@@ -26,6 +26,7 @@ nodo *criaNodo(int f, char c, int i){
     novo->pai = NULL; //PAI E FILHOS INICIALMENTE VAZIOS, NAS FOLHAS OS FILHOS SEMPRE SERÃO VAZIOS
     novo->filhoEsquerdo = NULL;
     novo->filhoDireito = NULL;
+    return novo;
 }
 
 nodo *criaPai(nodo *aux1, nodo *aux2, nodo *pai){
@@ -116,11 +117,11 @@ int imprimeBits(nodo *raiz, int i, int tam, int *Vt){
     }
     if(raiz->filhoEsquerdo->caminho[i] == 1){
         printf("%d", raiz->filhoEsquerdo->chave);
-        tam += imprimeBits(raiz->filhoEsquerdo, i, tam+1, Vt);
+        return imprimeBits(raiz->filhoEsquerdo, i, tam+1, Vt);
     }
-    if(raiz->filhoDireito->caminho[i] == 1){
+    else{
         printf("%d", raiz->filhoDireito->chave);
-        tam += imprimeBits(raiz->filhoDireito, i, tam+1, Vt);
+        return imprimeBits(raiz->filhoDireito, i, tam+1, Vt);
     }
 }
 
@@ -139,9 +140,16 @@ int *escreveCaminhos(nodo *raiz, int i, int *V, int j){
     return V;
 }
 
-int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char *argv2, int *tam){
+void escreveHzip(unsigned char hex, char *argv2){
+    FILE *e;
+    e = fopen(argv2, "ab");
+    fwrite(&hex, sizeof(unsigned char), 1, e); //ESCREVENDO O BINARIO NO ARQUIVO
+    fclose(e);
+}
+
+int *escreveLetras(char *palavra, nodo *raiz, int indice, int *V, char *argv2, int *tam){
     int binario = 0, j = 0, k = 0;
-    long int codigo = 0;
+    int codigo = 0;
     int i = 0;
     int soma = 0;
     int *buffer = (int*)malloc(8*sizeof(int));
@@ -188,10 +196,8 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
                 codigo = codigo / 10;
                 binario += resto * pow(2,k);
             }
-            int hex = binario;
-            e = fopen(argv2, "ab");
-            fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
-            fclose(e);
+            unsigned char hex = binario;
+            escreveHzip(hex, argv2);
             soma = 0;
             codigo = 0;
             binario = 0;
@@ -219,10 +225,8 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
                     codigo = codigo / 10;
                     binario += resto * pow(2,k);
                 }
-                int hex = binario;
-                e = fopen(argv2, "ab");
-                fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
-                fclose(e);
+                unsigned char hex = binario;
+                escreveHzip(hex, argv2);
                 soma = soma - 8;
                 codigo = 0;
                 binario = 0;
@@ -256,10 +260,8 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
                 codigo = codigo / 10;
                 binario += resto * pow(2,k);
             }
-            int hex = binario;
-            e = fopen(argv2, "ab");
-            fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
-            fclose(e);
+            unsigned char hex = binario;
+            escreveHzip(hex, argv2);
             for(i=0;i<8;i++){
                 buffer[i] = 0;
             }
@@ -290,10 +292,8 @@ int *escreveLetras(FILE *e, char *palavra, nodo *raiz, int indice, int *V, char 
                     codigo = codigo / 10;
                     binario += resto * pow(2,k);
                 }
-                int hex = binario;
-                e = fopen(argv2, "ab");
-                fwrite(&hex, 1, sizeof(unsigned char), e); //ESCREVENDO O BINARIO NO ARQUIVO
-                fclose(e);
+                unsigned char hex = binario;
+                escreveHzip(hex, argv2);
                 soma = soma - 8;
                 codigo = 0;
                 binario = 0;
@@ -319,21 +319,22 @@ int *contaLetra(int *Vetor, char *palavra, int indice){
     }
     else if(palavra[indice] == ' '){
         Vetor[27]++; //INCREMENTA A FREQUENCIA
-        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
+        return contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
     }
     else{
         Vetor[palavra[indice]-96]++; //INCREMENTA A FREQUENCIA
-        contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
+        return contaLetra(Vetor, palavra, indice+1); //CHAMA RECURSIVA PRA PROIMA LETRA
     }
 
 }
 
-/*void freeTrie(nodo *raiz){
+void freeTrie(nodo *raiz){
     if(raiz==NULL)return;
     freeTrie(raiz->filhoDireito);
     freeTrie(raiz->filhoEsquerdo);
     free(raiz);
-}*/
+    raiz = NULL;
+}
 
 int main(int argc, char *argv[]){
     char palavra[max]; //AQUI SERA ARMAZENADO NOSSO VETOR DE CARACTERES DO ARQUIVO TXT
@@ -703,12 +704,11 @@ int main(int argc, char *argv[]){
 
     FILE *leitura;
     leitura = fopen(argv[1], "r");
-    FILE *escrita;
     int *Vetor = (int*)malloc(8*sizeof(int));
     for(i=0;i<8;i++) Vetor[i] = 0;
     int j=0;
     while(fgets(palavra, max, leitura) != NULL){ //ARAMAZENANDO O ARQUIVO COMPRIMIDO
-        Vetor = escreveLetras(escrita, palavra, novo[1], 0, Vetor, argv[2], tam);
+        Vetor = escreveLetras(palavra, novo[1], 0, Vetor, argv[2], tam);
     }
     int *buffer = (int*)malloc(8*sizeof(int));
     for(i=0;i<8;i++){
@@ -743,9 +743,17 @@ int main(int argc, char *argv[]){
     else if(soma>=9){
         k = 0;
         while(soma>=9){
-            for(j=soma-tamG;j<8;j++){
-                buffer[j] = Vetor[k];
-                k++;
+            if(soma-tamG  > 1){
+                for(j=soma-tamG;j<8;j++){
+                    buffer[j] = Vetor[k];
+                    k++;
+                }
+            }
+            else{
+                for(j=0;j<8;j++){
+                    buffer[j] = Vetor[k];
+                    k++;
+                }
             }
             for(j=0;j<8;j++){
                 codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
@@ -756,9 +764,7 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             int hex = binario;
-            escrita = fopen(argv[2], "ab");
-            fwrite(&hex, 1, sizeof(unsigned char), escrita); //ESCREVENDO O BINARIO NO ARQUIVO
-            fclose(escrita);
+            escreveHzip(hex, argv[2]);
             soma = soma - 8;
             codigo = 0;
             binario = 0;
@@ -779,9 +785,7 @@ int main(int argc, char *argv[]){
                 binario += resto * pow(2,k);
             }
             int hex = binario;
-            escrita = fopen(argv[2], "ab");
-            fwrite(&hex, 1, sizeof(unsigned char), escrita); //ESCREVENDO O BINARIO NO ARQUIVO
-            fclose(escrita);
+            escreveHzip(hex, argv[2]);
             soma = soma - 8;
             codigo = 0;
             binario = 0;
@@ -801,9 +805,7 @@ int main(int argc, char *argv[]){
             binario += resto * pow(2,k);
         }
         int hex = binario;
-        escrita = fopen(argv[2], "ab");
-        fwrite(&hex, 1, sizeof(unsigned char), escrita); //ESCREVENDO O BINARIO NO ARQUIVO
-        fclose(escrita);
+        escreveHzip(hex, argv[2]);
         soma = 0;
         codigo = 0;
         binario = 0;
@@ -813,9 +815,8 @@ int main(int argc, char *argv[]){
     free(tam);
     free(Vetor);
     free(buffer);
-    //for(i=0;i<alpha;i++){
-        //freeTrie(novo[i]);
-    //}
-    printf("FIM!\n");
+    for(i=0;i<alpha;i++){
+        freeTrie(novo[i]);
+    }
     return 0;
 }
