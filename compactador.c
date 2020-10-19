@@ -1,7 +1,7 @@
 #include <stdio.h> //BIBLIOTECA IN E OUT
-#include <stdlib.h> //BIBLIOTECA PADRÃO
+#include <stdlib.h> //BIBLIOTECA PADRï¿½O
 #include <math.h>
-#define alpha 30 //NOSSO ALFABETO TERA 29 ELEMENTOS, DE a À z, ' ', '\n', 'EOF'. 1 INDEXADO
+#define alpha 30 //NOSSO ALFABETO TERA 29 ELEMENTOS, DE a ï¿½ z, ' ', '\n', 'EOF'. 1 INDEXADO
 #define max 1000000
 
 typedef struct Nodo{
@@ -12,7 +12,7 @@ typedef struct Nodo{
 }nodo;
 
 nodo *criaNodo(int f, char c, int i){
-    int j; //VARIAVEL DE ITERAÇAO
+    int j; //VARIAVEL DE ITERAï¿½AO
     nodo *novo = (nodo*)malloc(sizeof(nodo)); //LIBERANDO A MEMORIA PRO NODO
     novo->frequencia = f; //DEFININDO A FREQUENCIA DO NODO
     novo->chave = 0; //DEFININDO A CHAVE DO NODO
@@ -23,7 +23,7 @@ nodo *criaNodo(int f, char c, int i){
         else novo->caminho[j] = 0;
     }
     novo->letra = c; //DEFININDO A LETRA DO NODO
-    novo->pai = NULL; //PAI E FILHOS INICIALMENTE VAZIOS, NAS FOLHAS OS FILHOS SEMPRE SERÃO VAZIOS
+    novo->pai = NULL; //PAI E FILHOS INICIALMENTE VAZIOS, NAS FOLHAS OS FILHOS SEMPRE SERï¿½O VAZIOS
     novo->filhoEsquerdo = NULL;
     novo->filhoDireito = NULL;
     return novo;
@@ -53,16 +53,16 @@ nodo **heapfy(nodo **novo, int i, int tam){
     int j = i;
     while(2*j < tam){ //ENQUANTO 2*J FOR MENOR QUE O TAMANHO DO 'VETOR'
         int aux = 2*j;
-        if(aux+1<tam && novo[aux]->frequencia > novo[aux + 1]->frequencia){ //SE AUX + 1 FOR MAIOR QUE O TAMANHO ESTAREMOS VERIFICANDO UMA POSIÇAO INEXISTENTE
+        if(aux+1<tam && novo[aux]->frequencia > novo[aux + 1]->frequencia){ //SE AUX + 1 FOR MAIOR QUE O TAMANHO ESTAREMOS VERIFICANDO UMA POSIï¿½AO INEXISTENTE
             aux = aux + 1;
         }
-        if(novo[j]->frequencia <= novo[aux]->frequencia){//SE O ELEMENTO EM J FOR O MENOR, TROQUE J POR TAM E ACABE A ITERAÇAO
+        if(novo[j]->frequencia <= novo[aux]->frequencia){//SE O ELEMENTO EM J FOR O MENOR, TROQUE J POR TAM E ACABE A ITERAï¿½AO
             j = tam;
         }
         else{
             nodo *temp;
             if(novo[j]->letra == '\0'){
-                temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+                temp = criaNodo(novo[j]->frequencia, novo[j]->letra, 29); //GARATIMOS QUE O NOVO[0] ï¿½ O MENOR NODO, ENTï¿½O CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
                 temp->filhoDireito = novo[j]->filhoDireito;
                 temp->filhoEsquerdo = novo[j]->filhoEsquerdo;
             }
@@ -105,7 +105,7 @@ nodo **heapfy(nodo **novo, int i, int tam){
 nodo **heap(nodo **novo, int tam){ //USAMOS O NODO E O TAMANHO ATUAL DO 'VETOR'
     int i;
     for(i = (tam/2);i>=1;i--){
-        novo = heapfy(novo, i, tam); //FUNÇAO QUE FARA AS ALTERAÇOES DE POSIÇOES PARA FORMAR UMA MIN-HEAP
+        novo = heapfy(novo, i, tam); //FUNï¿½AO QUE FARA AS ALTERAï¿½OES DE POSIï¿½OES PARA FORMAR UMA MIN-HEAP
     }
     return novo;
 }
@@ -175,7 +175,7 @@ int *escreveLetras(char *palavra, nodo *raiz, int indice, int *V, char *argv2, i
         }
         else{
             tamG = tam[palavra[indice]-96];
-            V = (int*)malloc(tam[i]*sizeof(int));
+            V = (int*)malloc(tamG*sizeof(int));
             for(j=0;j<tam[palavra[indice]-96];j++){
                 V[j] = 0;
             }
@@ -279,25 +279,35 @@ int *escreveLetras(char *palavra, nodo *raiz, int indice, int *V, char *argv2, i
 
         else if(soma>=9){
             k = 0;
-            while(soma>=9){
+            int vez = 0;
+        while(soma>=9){
+            if(vez == 0){
                 for(j=soma-tamG;j<8;j++){
                     buffer[j] = V[k];
                     k++;
                 }
-                for(j=0;j<8;j++){
-                    codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
-                }
-                for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
-                    int resto = codigo - ((codigo / 10)*10);
-                    codigo = codigo / 10;
-                    binario += resto * pow(2,k);
-                }
-                unsigned char hex = binario;
-                escreveHzip(hex, argv2);
-                soma = soma - 8;
-                codigo = 0;
-                binario = 0;
+                vez++;
             }
+            else{
+                for(j=0;j<8;j++){
+                    buffer[j] = V[k];
+                    k++;
+                }
+            }
+            for(j=0;j<8;j++){
+                codigo += buffer[j]*pow(10, 8-j-1); //ESCREVER O CODIGO COMO 1 INT
+            }
+            for (int k=0; k<8; k++) {//TRANSFORMANDO O CODIGO DE UM INT PARA BINARIO.
+                int resto = codigo - ((codigo / 10)*10);
+                codigo = codigo / 10;
+                binario += resto * pow(2,k);
+            }
+            int hex = binario;
+            escreveHzip(hex, argv2);
+            soma = soma - 8;
+            codigo = 0;
+            binario = 0;
+        }
             for(j=0;j<soma;j++){
                 buffer[j] = V[k];
                 k++;
@@ -329,17 +339,18 @@ int *contaLetra(int *Vetor, char *palavra, int indice){
 }
 
 void freeTrie(nodo *raiz){
-    if(raiz==NULL)return;
-    freeTrie(raiz->filhoDireito);
-    freeTrie(raiz->filhoEsquerdo);
-    free(raiz);
-    raiz = NULL;
+    if(raiz != NULL){
+        freeTrie(raiz->filhoDireito);
+        freeTrie(raiz->filhoEsquerdo);
+        free(raiz);
+        raiz = NULL;
+    }
 }
 
 int main(int argc, char *argv[]){
     char palavra[max]; //AQUI SERA ARMAZENADO NOSSO VETOR DE CARACTERES DO ARQUIVO TXT
 
-    FILE *file; //DECLARAÇAO PADRAO DO FILE
+    FILE *file; //DECLARAï¿½AO PADRAO DO FILE
     file = fopen(argv[1], "r"); //ABRINDO NO MODO LEITURA O TEXTO DO USUARIO
     if(file == NULL) return 0; //TRATAMENTO DE ERRO
     int i; //VARIAVEL DE ITERACAO
@@ -374,10 +385,10 @@ int main(int argc, char *argv[]){
     } //FIM DA TABELA, FOLHAS CRIADAS  ----TUDO CERTO ATE AQUI----
     int aux = alpha;
     while(aux>2){ //AQUI FAREMOS O HEAPFY, TAMBEM MONTAREMOS A TRIE COMPLETA
-        novo = heap(novo, aux); //CHAMA A FUNÇAO QUE MUDA AS POSIÇOES DAS FOLHAS, DE MODO A DEIXA-LAS EM UMA MIN-HEAP ----FUNÇAO HEAPFY RETORNA UMA MIN HEAP----
+        novo = heap(novo, aux); //CHAMA A FUNï¿½AO QUE MUDA AS POSIï¿½OES DAS FOLHAS, DE MODO A DEIXA-LAS EM UMA MIN-HEAP ----FUNï¿½AO HEAPFY RETORNA UMA MIN HEAP----
         nodo *menor1; //CRIANDO O NODO QUE RECEBERA O MENOR VALOR DA HEAP
         if(novo[1]->letra == '\0'){
-            menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+            menor1 = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] ï¿½ O MENOR NODO, ENTï¿½O CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
             menor1->pai = novo[1]->pai;
             menor1->filhoDireito = novo[1]->filhoDireito;
             menor1->filhoEsquerdo = novo[1]->filhoEsquerdo;
@@ -411,10 +422,10 @@ int main(int argc, char *argv[]){
         novo[1] = novo[aux]; //SUBSTITUINDO O VALOR JA UTILIZADO POR OUTRO QUE ESTAVA NO FIM DO VETOR
         //AGR FAZ EXATAMENTE A MESMA COISA PRA PEGAR A 2 FOLHA
 
-        novo = heap(novo, aux); //CHAMA A FUNÇAO QUE MUDA AS POSIÇOES DAS FOLHAS, DE MODO A DEIXA-LAS EM UMA MIN-HEAP ----FUNÇAO HEAPFY RETORNA UMA MIN HEAP----
+        novo = heap(novo, aux); //CHAMA A FUNï¿½AO QUE MUDA AS POSIï¿½OES DAS FOLHAS, DE MODO A DEIXA-LAS EM UMA MIN-HEAP ----FUNï¿½AO HEAPFY RETORNA UMA MIN HEAP----
         nodo *menor2; //CRIANDO O NODO QUE RECEBERA O MENOR VALOR DA HEAP
         if(novo[1]->letra == '\0'){
-            menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+            menor2 = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] ï¿½ O MENOR NODO, ENTï¿½O CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
             menor2->pai = novo[1]->pai;
             menor2->filhoDireito = novo[1]->filhoDireito;
             menor2->filhoEsquerdo = novo[1]->filhoEsquerdo;
@@ -448,7 +459,7 @@ int main(int argc, char *argv[]){
         novo[1] = novo[aux]; //SUBSTITUINDO O VALOR JA UTILIZADO POR OUTRO QUE ESTAVA NO FIM DO VETOR
         nodo *temp;
         if(novo[1]->letra == '\0'){
-            temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] É O MENOR NODO, ENTÃO CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
+            temp = criaNodo(novo[1]->frequencia, novo[1]->letra, 29); //GARATIMOS QUE O NOVO[0] ï¿½ O MENOR NODO, ENTï¿½O CRIAMOS UM NODO AUXILIAR COM SUAS CARACTERISTICAS
             temp->pai = novo[1]->pai;
             temp->filhoDireito = novo[1]->filhoDireito;
             temp->filhoEsquerdo = novo[1]->filhoEsquerdo;
@@ -496,7 +507,7 @@ int main(int argc, char *argv[]){
     FILE *fp;
     fp = fopen(argv[2], "wb");
     unsigned char hex = 0;
-    for(i=1;i<30;i++){ //COMEÇANDO A ARMAZENAR O CABEÇALHO
+    for(i=1;i<30;i++){ //COMEï¿½ANDO A ARMAZENAR O CABEï¿½ALHO
         int j=0;
         int codigo = 0;
         hex = tam[i];
@@ -700,7 +711,7 @@ int main(int argc, char *argv[]){
             codigo =0;
         }
         free(V);
-    } //FIM DO CABEÇALHO
+    } //FIM DO CABECALHO
 
     FILE *leitura;
     leitura = fopen(argv[1], "r");
@@ -742,12 +753,14 @@ int main(int argc, char *argv[]){
     }
     else if(soma>=9){
         k = 0;
+        int vez = 0;
         while(soma>=9){
-            if(soma-tamG  > 1){
+            if(vez == 0){
                 for(j=soma-tamG;j<8;j++){
                     buffer[j] = Vetor[k];
                     k++;
                 }
+                vez++;
             }
             else{
                 for(j=0;j<8;j++){
@@ -815,8 +828,7 @@ int main(int argc, char *argv[]){
     free(tam);
     free(Vetor);
     free(buffer);
-    for(i=0;i<alpha;i++){
-        freeTrie(novo[i]);
-    }
+    freeTrie(novo[1]);
+    free(novo);
     return 0;
 }
